@@ -25,6 +25,7 @@ def getInetName(i):
 
 @app.route('/iproutes')
 def iproutes():
+    assert false
     return 'ip routes'
 
 
