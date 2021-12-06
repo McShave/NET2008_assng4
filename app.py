@@ -10,7 +10,6 @@ def welcome():
 
 
 def getInetAddress(line):
-    assert(false)
     items = line.split("inet addr:")
     if len(items) > 1:
         return items[1].split()[0]
