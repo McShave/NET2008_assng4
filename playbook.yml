@@ -1,0 +1,49 @@
+---
+
+- name: NET2008 Assignment 4 Retrieve and install Python App
+  
+  hosts: localhost
+  connection: local
+  become_user: root
+  become: yes
+  vars:
+    package_names:
+      - python3-pip
+      - git
+
+  tasks:
+   - name: Retrieve package Info
+     ansible.builtin.package_facts:
+       manager: auto
+
+   - name: Install Packages if not Installed on Debian System
+     apt:
+       name: "{{ item }}"
+       update_cache: yes
+     loop: "{{ package_names }}"
+     when: item|string not in ansible_facts.packages and ansible_facts['os_family'] == "Debian"
+   
+   - name: Install Packages if not Installed on RedHat System
+     yum:
+       name: "{{ item }}"
+       update_cache: yes
+     loop: "{{ package_names }}"
+     when: item|string not in ansible_facts.packages and ansible_facts['os_family'] == "RedHat"
+
+   - name: Make Destination for Git Repo if Needed
+     ansible.builtin.file:
+       path: /src/assng4
+       state: directory
+
+   - name: Retrieve Git Repo
+     git:
+       repo: 'https://github.com/gourteacher/Assignment4CodeBase.git' 
+       dest: /src/assng4
+
+   - name: Install Python App Dependencies
+     command: "pip install -r /src/assng4/requirements.txt"
+
+   - name: Start Python App
+     script: /src/assng4/app.py
+     args:
+       executable: python3
